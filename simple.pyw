@@ -41,7 +41,7 @@ try:
 except ImportError:
     HAS_DND = False
 
-# ========================== 工作室底层防伪配置 ==========================
+# ========================== simple底层防伪配置 ==========================
 STUDIO_SECRET_SALT = "T@k3_Y0ur_T1m3_H@Ias3r!#_8a7p6c5_E4e7f2g1h_$%^&*_QWE4O5sI4P_9Q2_6_!"
 CONFIG_FILE = "config.json"
 
@@ -76,7 +76,7 @@ def save_global_config(data):
 class LinkOpenerApp:
     def __init__(self, root, config_data):
         self.root = root
-        self.root.title("七星剑CNVD - Studio Authorized Edition")
+        self.root.title("simple - Studio Authorized Edition")
         
         self.root.geometry("1350x850")
         self.root.minsize(1300, 800)
@@ -1861,7 +1861,7 @@ class AuthWindow:
         
         self.auth_root.protocol("WM_DELETE_WINDOW", self.on_close)
         
-        tk.Label(self.auth_root, text="🛡️ 七星剑 - 工作室独家授权版", font=("Microsoft YaHei", 14, "bold"), bg="#F5F5F7", fg="#1C1C1E").pack(pady=(20, 5))
+        tk.Label(self.auth_root, text="simple", font=("Microsoft YaHei", 14, "bold"), bg="#F5F5F7", fg="#1C1C1E").pack(pady=(20, 5))
         tk.Label(self.auth_root, text="首次运行需要进行设备绑定，请联系管理员获取激活码", font=("Microsoft YaHei", 9), bg="#F5F5F7", fg="#8E8E93").pack(pady=(0, 15))
         
         f1 = tk.Frame(self.auth_root, bg="#F5F5F7")
@@ -1898,7 +1898,7 @@ class AuthWindow:
         if user_input == expected_key:
             self.config["auth_key"] = user_input
             save_global_config(self.config)
-            messagebox.showinfo("激活成功", "设备绑定成功！欢迎使用七星剑系统。", parent=self.auth_root)
+            messagebox.showinfo("激活成功", "设备绑定成功！欢迎使用simple工具。", parent=self.auth_root)
             self.auth_root.destroy()
             if HAS_DND:
                 self.root.deiconify() 
