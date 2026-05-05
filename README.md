@@ -1,10 +1,6 @@
-# 七星剑 CNVD 测试工具
+# simple 测试工具
 
-七星剑 CNVD 是一个基于 Tkinter 的 Windows 桌面工具，用于在授权范围内进行资产采集、资产整理、存活检测和简单的 Payload 探测。当前仓库包含测试版本主程序：
-
-```text
-七星剑CNVD_1.2_测试版本.pyw
-```
+simple 是一个基于 Tkinter 的 Windows 桌面工具，用于在授权范围内进行资产采集、资产整理、存活检测和简单的 Payload 探测。当前仓库包含测试版本主程序：
 
 ## 功能概览
 
@@ -50,7 +46,7 @@ python -m pip install psutil tkinterdnd2
 在项目目录中执行：
 
 ```powershell
-python ".\七星剑CNVD_1.2_测试版本.pyw"
+python ".\simple.pyw"
 ```
 
 也可以在 Windows 资源管理器中双击 `.pyw` 文件启动。
@@ -85,5 +81,5 @@ python ".\七星剑CNVD_1.2_测试版本.pyw"
 ```text
 .
 ├── README.md
-└── 七星剑CNVD_1.2_测试版本.pyw
+└── simple.pyw
 ```
