@@ -11,8 +11,6 @@ import os
 import re
 import csv
 import subprocess
-import uuid
-import hashlib
 import base64
 
 # 【核心替换】引入 requests 库，并强行关闭烦人的 SSL 不安全警告
@@ -41,24 +39,13 @@ try:
 except ImportError:
     HAS_DND = False
 
-# ========================== simple底层防伪配置 ==========================
-STUDIO_SECRET_SALT = "T@k3_Y0ur_T1m3_H@Ias3r!#_8a7p6c5_E4e7f2g1h_$%^&*_QWE4O5sI4P_9Q2_6_!"
+# ========================== simple底层配置 ==========================
 CONFIG_FILE = "config.json"
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
     'Accept': 'application/json, text/javascript, */*; q=0.01'
 }
-
-def get_machine_id():
-    mac_num = hex(uuid.getnode())
-    raw_mid = hashlib.md5(mac_num.encode('utf-8')).hexdigest().upper()[:16]
-    return re.sub(r'[^A-Z0-9]', '', raw_mid)
-
-def get_expected_key(machine_id):
-    clean_mid = re.sub(r'[^A-Z0-9]', '', machine_id.upper())
-    raw_str = clean_mid + STUDIO_SECRET_SALT
-    return hashlib.sha256(raw_str.encode('utf-8')).hexdigest().upper()[:20]
 
 def load_global_config():
     if os.path.exists(CONFIG_FILE):
@@ -76,7 +63,7 @@ def save_global_config(data):
 class LinkOpenerApp:
     def __init__(self, root, config_data):
         self.root = root
-        self.root.title("simple - Studio Authorized Edition")
+        self.root.title("simple")
         
         self.root.geometry("1350x850")
         self.root.minsize(1300, 800)
@@ -268,8 +255,8 @@ class LinkOpenerApp:
         status_frame.pack(side=tk.BOTTOM, fill=tk.X, padx=15, pady=5)
         self.lbl_info = tk.Label(status_frame, text="RAM: -% | CPU: -%", bg="#F5F5F7", font=("Arial", 8), fg="#8E8E93")
         self.lbl_info.pack(side=tk.LEFT)
-        self.lbl_auth = tk.Label(status_frame, text=f"授权设备: {get_machine_id()}", bg="#F5F5F7", font=("Microsoft YaHei", 8), fg="#34C759")
-        self.lbl_auth.pack(side=tk.RIGHT, padx=20)
+        self.lbl_ready = tk.Label(status_frame, text="直接可用", bg="#F5F5F7", font=("Microsoft YaHei", 8), fg="#34C759")
+        self.lbl_ready.pack(side=tk.RIGHT, padx=20)
         self.lbl_count = tk.Label(status_frame, text="资产总计: 0  |  已勾选: 0", bg="#F5F5F7", font=("Microsoft YaHei", 9, "bold"), fg="#007AFF")
         self.lbl_count.pack(side=tk.RIGHT)
 
@@ -552,7 +539,7 @@ class LinkOpenerApp:
         log_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10)
         self.text_log = tk.Text(log_frame, bg="white", fg="#1C1C1E", font=("Courier New", 9), bd=0)
         self.text_log.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-        self.log("系统核心加载完毕，当前设备已永久绑定并授权...")
+        self.log("系统核心加载完毕，软件已直接进入可用状态...")
 
     def setup_text_dedup_tab(self):
         t = tk.Frame(self.tab_text_dedup, bg="white", padx=15, pady=15)
@@ -1841,95 +1828,15 @@ class LinkOpenerApp:
             self.log(f"👯 目标列查重完毕：已无差别勾选 {count} 条存在重复的数据。")
 
 
-# ========================== 工作室一机一码验证锁 ==========================
-class AuthWindow:
-    def __init__(self, root, config):
-        self.root = root
-        self.config = config
-        self.machine_id = get_machine_id()
-        
-        self.auth_root = tk.Toplevel(root)
-        self.auth_root.title("安全验证 - 工作室内部工具")
-        self.auth_root.geometry("420x280")
-        self.auth_root.configure(bg="#F5F5F7")
-        self.auth_root.resizable(False, False)
-        
-        self.auth_root.update_idletasks()
-        x = (self.auth_root.winfo_screenwidth() // 2) - (420 // 2)
-        y = (self.auth_root.winfo_screenheight() // 2) - (280 // 2)
-        self.auth_root.geometry(f'+{x}+{y}')
-        
-        self.auth_root.protocol("WM_DELETE_WINDOW", self.on_close)
-        
-        tk.Label(self.auth_root, text="simple", font=("Microsoft YaHei", 14, "bold"), bg="#F5F5F7", fg="#1C1C1E").pack(pady=(20, 5))
-        tk.Label(self.auth_root, text="首次运行需要进行设备绑定，请联系管理员获取激活码", font=("Microsoft YaHei", 9), bg="#F5F5F7", fg="#8E8E93").pack(pady=(0, 15))
-        
-        f1 = tk.Frame(self.auth_root, bg="#F5F5F7")
-        f1.pack(fill=tk.X, padx=40, pady=5)
-        tk.Label(f1, text="您的专属机器码：", font=("Microsoft YaHei", 9, "bold"), bg="#F5F5F7").pack(anchor="w")
-        
-        f1_sub = tk.Frame(f1, bg="#F5F5F7")
-        f1_sub.pack(fill=tk.X)
-        self.entry_mid = tk.Entry(f1_sub, font=("Consolas", 11, "bold"), fg="#FF3B30", bg="#E5E5EA", bd=0, justify="center")
-        self.entry_mid.insert(0, self.machine_id)
-        self.entry_mid.config(state="readonly")
-        self.entry_mid.pack(side=tk.LEFT, fill=tk.X, expand=True, ipady=4)
-        tk.Button(f1_sub, text="复制", bg="#D1D1D6", bd=0, command=self.copy_mid).pack(side=tk.LEFT, padx=(5,0), ipady=2)
-
-        f2 = tk.Frame(self.auth_root, bg="#F5F5F7")
-        f2.pack(fill=tk.X, padx=40, pady=10)
-        tk.Label(f2, text="请输入激活密钥：", font=("Microsoft YaHei", 9, "bold"), bg="#F5F5F7").pack(anchor="w")
-        self.entry_key = tk.Entry(f2, font=("Consolas", 11), justify="center", bd=0, highlightthickness=1, highlightbackground="#D1D1D6")
-        self.entry_key.pack(fill=tk.X, ipady=4)
-        self.entry_key.bind('<Return>', lambda e: self.verify_key())
-        
-        tk.Button(self.auth_root, text="🔓 验证并永久绑定本设备", font=("Microsoft YaHei", 10, "bold"), bg="#007AFF", fg="white", bd=0, width=25, pady=6, command=self.verify_key).pack(pady=5)
-        self.entry_key.focus_set()
-
-    def copy_mid(self):
-        self.auth_root.clipboard_clear()
-        self.auth_root.clipboard_append(self.machine_id)
-        messagebox.showinfo("复制成功", "机器码已复制，请发给管理员索要激活码！", parent=self.auth_root)
-
-    def verify_key(self):
-        user_input = re.sub(r'[^A-Z0-9]', '', self.entry_key.get().strip().upper())
-        expected_key = get_expected_key(self.machine_id)
-        
-        if user_input == expected_key:
-            self.config["auth_key"] = user_input
-            save_global_config(self.config)
-            messagebox.showinfo("激活成功", "设备绑定成功！欢迎使用simple工具。", parent=self.auth_root)
-            self.auth_root.destroy()
-            if HAS_DND:
-                self.root.deiconify() 
-                app = LinkOpenerApp(self.root, self.config)
-            else:
-                self.root.deiconify()
-                app = LinkOpenerApp(self.root, self.config)
-        else:
-            messagebox.showerror("验证失败", "激活密钥错误或不匹配本机！\n未经授权禁止使用本工作室工具。", parent=self.auth_root)
-            self.entry_key.delete(0, tk.END)
-
-    def on_close(self):
-        self.root.destroy()
-
 # ========================== 程序入口 ==========================
 if __name__ == "__main__":
     global_config = load_global_config()
-    current_machine_id = get_machine_id()
-    expected_key = get_expected_key(current_machine_id)
     
     if HAS_DND:
         main_root = TkinterDnD.Tk()
     else:
         main_root = tk.Tk()
-        
-    main_root.withdraw() 
-    
-    if global_config.get("auth_key") == expected_key:
-        main_root.deiconify()
-        app = LinkOpenerApp(main_root, global_config)
-    else:
-        auth_app = AuthWindow(main_root, global_config)
+
+    app = LinkOpenerApp(main_root, global_config)
         
     main_root.mainloop()
