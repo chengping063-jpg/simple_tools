@@ -1347,6 +1347,8 @@ class LinkOpenerApp:
                 self.root.after(0, lambda a=asset: self.log(f"\n--- 🎯 [线程启动] 锁定资产: {a} ---"))
                 
                 asset_all_success = True 
+                asset_output_blocks = []
+                asset_saved_count = 0
                 
                 for fp in fp_lines:
                     if self.stop_fofa_batch_flag: break
@@ -1391,22 +1393,20 @@ class LinkOpenerApp:
                                 self.root.after(0, _gui_insert_async)
                         
                                 if not is_under_threshold:
-                                    safe_asset_name = re.sub(r'[\\/:*?"<>|]', '_', asset)
-                                    save_path = os.path.join(export_folder, f"{safe_asset_name}.txt")
-                                    with file_lock:
-                                        try:
-                                            with open(save_path, 'a', encoding='utf-8') as sf:
-                                                sf.write(f"\n{'='*40}\n")
-                                                sf.write(f"[+] 使用指纹: {fp}\n")
-                                                sf.write(f"[-] 实际执行: {query}\n")
-                                                sf.write(f"[-] 共查到 {len(res)} 个结果\n")
-                                                sf.write(f"{'='*40}\n")
-                                                for item_data in res:
-                                                    host = str(item_data[0]) if len(item_data) > 0 else ""
-                                                    link = host if host.startswith("http") else "http://" + host
-                                                    sf.write(f"{link}\n")
-                                        except Exception: pass
-                                    self.root.after(0, lambda a=asset, cnt=len(res), d=export_folder: self.log(f"{a}查询完成，共{cnt}条记录，已保存到{d}"))
+                                    block_lines = [
+                                        f"\n{'='*40}",
+                                        f"[+] 使用指纹: {fp}",
+                                        f"[-] 实际执行: {query}",
+                                        f"[-] 共查到 {len(res)} 个结果",
+                                        f"{'='*40}"
+                                    ]
+                                    for item_data in res:
+                                        host = str(item_data[0]) if len(item_data) > 0 else ""
+                                        link = host if host.startswith("http") else "http://" + host
+                                        block_lines.append(link)
+                                    asset_output_blocks.append("\n".join(block_lines) + "\n")
+                                    asset_saved_count += len(res)
+                                    self.root.after(0, lambda a=asset, cnt=len(res): self.log(f"{a}查询完成，共{cnt}条记录，已加入汇总输出"))
                                 else:
                                     self.root.after(0, lambda a=asset, cnt=len(res): self.log(f"{a}查询完成，共{cnt}条记录 (未达阈值，拒绝入库)"))
                             else:
@@ -1427,6 +1427,17 @@ class LinkOpenerApp:
                     if not asset_all_success:
                         self.root.after(0, lambda a=asset: self.log(f"⚠️ [{a}] 触发异常保护，放弃剩余指纹，跳至下一资产..."))
                         break 
+
+                if asset_output_blocks:
+                    safe_asset_name = re.sub(r'[\\/:*?"<>|]', '_', asset)
+                    save_filename = f"{safe_asset_name}_{asset_saved_count}.txt"
+                    save_path = os.path.join(export_folder, save_filename)
+                    with file_lock:
+                        try:
+                            with open(save_path, 'w', encoding='utf-8') as sf:
+                                sf.write("".join(asset_output_blocks))
+                        except Exception: pass
+                    self.root.after(0, lambda a=asset, cnt=asset_saved_count, name=save_filename, d=export_folder: self.log(f"{a}汇总保存完成，共{cnt}条记录，已生成{name}，保存到{d}"))
 
                 if not self.stop_fofa_batch_flag:
                     if asset_all_success:
@@ -1485,10 +1496,10 @@ class LinkOpenerApp:
                 
                             if not is_under_threshold:
                                 safe_fp_name = re.sub(r'[\\/:*?"<>|]', '_', fp)[:50] 
-                                save_path = os.path.join(export_folder, f"指纹查询_{safe_fp_name}.txt")
+                                save_path = os.path.join(export_folder, f"指纹查询_{safe_fp_name}_{len(res)}.txt")
                                 with file_lock:
                                     try:
-                                        with open(save_path, 'a', encoding='utf-8') as sf:
+                                        with open(save_path, 'w', encoding='utf-8') as sf:
                                             sf.write(f"\n{'='*40}\n")
                                             sf.write(f"[+] 查询指纹: {fp}\n")
                                             sf.write(f"[-] 共查到 {len(res)} 个结果\n")
