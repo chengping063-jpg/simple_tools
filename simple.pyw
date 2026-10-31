@@ -13,7 +13,7 @@ import csv
 import subprocess
 import base64
 
-# 【核心替换】引入 requests 库，并强行关闭烦人的 SSL 不安全警告
+# 引入 requests 库，并强行关闭 SSL 不安全警告
 import requests
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -32,7 +32,7 @@ try:
 except ImportError:
     HAS_WINSOUND = False
 
-# 【新增】丝滑拖拽支持库
+# 丝滑拖拽支持库
 try:
     from tkinterdnd2 import TkinterDnD, DND_FILES
     HAS_DND = True
@@ -105,7 +105,7 @@ class LinkOpenerApp:
         self.update_sys_info()
         
         if not HAS_DND:
-            self.root.after(1500, lambda: self.log("⚠️ 检测到未安装拖拽支持库！如需开启【文件拖拽】功能，请在CMD执行: pip install tkinterdnd2"))
+            self.root.after(1500, lambda: self.log("检测到未安装拖拽支持库！如需开启文件拖拽功能，请在CMD执行: pip install tkinterdnd2"))
 
     def toggle_window_mode(self):
         if not self.is_zoomed:
@@ -116,7 +116,7 @@ class LinkOpenerApp:
                 self.root.attributes('-zoomed', True)
             self.root.resizable(False, False)
             self.is_zoomed = True
-            self.btn_window_mode.config(text="🪟   切换为缩小模式", bg="#FF9500")
+            self.btn_window_mode.config(text="切换为缩小模式", bg="#FF9500")
         else:
             self.root.resizable(True, True)
             if os.name == 'nt':
@@ -126,7 +126,7 @@ class LinkOpenerApp:
             self.root.geometry("1350x850")
             self.root.resizable(False, False)
             self.is_zoomed = False
-            self.btn_window_mode.config(text="🖥️   切换为全屏模式", bg="#007AFF")
+            self.btn_window_mode.config(text="切换为全屏模式", bg="#007AFF")
 
     def enable_drag_drop(self, widget, expected_type):
         if HAS_DND:
@@ -143,52 +143,52 @@ class LinkOpenerApp:
             if os.path.isfile(path) and path.lower().endswith(('.txt', '.csv')):
                 self.import_data_to_table_smart(path)
             else:
-                messagebox.showwarning("格式错误", "🚫 无法识别！\n\n请将包含资产数据的【.txt】或【.csv】文件拖入表格区域。")
+                messagebox.showwarning("格式错误", "无法识别！\n\n请将包含资产数据的.txt或.csv文件拖入表格区域。")
                 
         elif expected_type == 'txt':
             if os.path.isfile(path) and path.lower().endswith('.txt'):
                 widget.delete(0, tk.END)
                 widget.insert(0, path)
                 self.save_app_config(silent=True)
-                self.log(f"✅ 成功拖入并识别TXT文件: {os.path.basename(path)}")
+                self.log(f"成功拖入并识别TXT文件: {os.path.basename(path)}")
             else:
-                messagebox.showwarning("文件格式错误", "🚫 拒绝载入！\n\n该输入框仅支持【.txt】格式的文本文件。")
+                messagebox.showwarning("文件格式错误", "拒绝载入！\n\n该输入框仅支持.txt格式的文本文件。")
         
         elif expected_type == 'dir':
             if os.path.isdir(path):
                 widget.delete(0, tk.END)
                 widget.insert(0, path)
                 self.save_app_config(silent=True)
-                self.log(f"✅ 成功拖入并识别文件夹: {path}")
+                self.log(f"成功拖入并识别文件夹: {path}")
             else:
-                messagebox.showwarning("格式错误", "🚫 拒绝载入！\n\n该输入框仅支持【文件夹目录】。")
+                messagebox.showwarning("格式错误", "拒绝载入！\n\n该输入框仅支持文件夹目录。")
                 
         elif expected_type == 'wav':
             if os.path.isfile(path) and path.lower().endswith('.wav'):
                 widget.delete(0, tk.END)
                 widget.insert(0, path)
                 self.save_app_config(silent=True)
-                self.log(f"✅ 成功拖入并识别音频文件: {os.path.basename(path)}")
+                self.log(f"成功拖入并识别音频文件: {os.path.basename(path)}")
             else:
-                messagebox.showwarning("格式错误", "🚫 拒绝载入！\n\n请拖入【.wav】格式的音频文件。")
+                messagebox.showwarning("格式错误", "拒绝载入！\n\n请拖入.wav格式的音频文件。")
 
     def import_data_to_table_smart(self, path):
         try:
             with open(path, 'r', encoding='utf-8', errors='ignore') as f:
                 content = f.read().strip()
             if not content:
-                self.log(f"⚠️ 文件 {os.path.basename(path)} 为空！")
+                self.log(f"文件 {os.path.basename(path)} 为空！")
                 return
                 
             lines = content.split('\n')
             count = 0
             start_idx = len(self.tree.get_children()) + 1
             
-            self.log(f"🔄 正在智能分析文件 {os.path.basename(path)} 的数据结构...")
+            self.log(f"正在智能分析文件 {os.path.basename(path)} 的数据结构...")
 
             first_line = lines[0].lower()
             if ',' in first_line and any(k in first_line for k in ['url', 'host', 'ip', 'title', 'domain']):
-                self.log("✅ 嗅探到表头特征，启用 [结构化精准映射模式]")
+                self.log("嗅探到表头特征，启用结构化精准映射模式")
                 reader = csv.DictReader(StringIO(content))
                 for row in reader:
                     row_lower = {k.lower().strip(): v for k, v in row.items() if k}
@@ -211,7 +211,7 @@ class LinkOpenerApp:
                     self.tree.insert("", "end", values=("☐", i, country, icp, title, url, "-", status, product), tags=(tag,))
                     count += 1
             else:
-                self.log("✅ 未检测到表头，启用 [AI正则模糊提取模式]")
+                self.log("未检测到表头，启用AI正则模糊提取模式")
                 for line in lines:
                     line = line.strip()
                     if not line: continue
@@ -243,11 +243,11 @@ class LinkOpenerApp:
                     count += 1
                     
             self.update_range_end()
-            self.log(f"🎉 智能解析完毕！成功将 {count} 条资产解剖并对号入座填入表格！")
+            self.log(f"智能解析完毕！成功将 {count} 条资产解剖并对号入座填入表格！")
             if count > 0 and HAS_WINSOUND: winsound.MessageBeep(winsound.MB_OK)
                 
         except Exception as e:
-            self.log(f"❌ 导入解析失败: {str(e)}")
+            self.log(f"导入解析失败: {str(e)}")
             messagebox.showerror("解析错误", f"无法识别该文件的数据结构：\n{e}")
 
     def setup_status_bar(self):
@@ -313,12 +313,12 @@ class LinkOpenerApp:
         self.enable_drag_drop(self.tree, 'table')
 
         self.menu = tk.Menu(self.root, tearoff=0, font=("Microsoft YaHei", 9))
-        self.menu.add_command(label="🚀 浏览器打开选中", command=self.open_selected_links)
+        self.menu.add_command(label="浏览器打开选中", command=self.open_selected_links)
         self.menu.add_separator()
-        self.menu.add_command(label="📋 复制 URL", command=lambda: self.copy_to_clip(5))
-        self.menu.add_command(label="📋 复制 IP:Port", command=lambda: self.copy_to_clip(5, strip_http=True))
+        self.menu.add_command(label="复制 URL", command=lambda: self.copy_to_clip(5))
+        self.menu.add_command(label="复制 IP:Port", command=lambda: self.copy_to_clip(5, strip_http=True))
         self.menu.add_separator()
-        self.menu.add_command(label="➖ 动态删除选中资产", command=self.delete_highlighted_rows)
+        self.menu.add_command(label="动态删除选中资产", command=self.delete_highlighted_rows)
         self.tree.bind("<Button-3>", self.show_context_menu)
 
     def sort_column(self, col):
@@ -419,7 +419,7 @@ class LinkOpenerApp:
                     vals[0] = "☑"
                     self.tree.item(item, values=vals)
                     count += 1
-        self.log(f"🎯 已成功勾选 {count} 条第 {col+1} 列包含 '{keyword}' 的数据。")
+        self.log(f"已成功勾选 {count} 条第 {col+1} 列包含 '{keyword}' 的数据。")
 
     def mark_duplicates(self):
         col = self.get_target_col()
@@ -427,7 +427,6 @@ class LinkOpenerApp:
         
         count = 0
         if col == 5:
-            # === 针对第6列（资产链接）的特殊清洗与查重逻辑 ===
             seen = set()
             for item in self.tree.get_children():
                 vals = list(self.tree.item(item, 'values'))
@@ -435,7 +434,6 @@ class LinkOpenerApp:
                 
                 if val not in ("-", "", "待测", "Error", "Timeout"):
                     try:
-                        # 解析URL，精准剥离端口号及后续路径内容
                         parsed = urllib.parse.urlparse(val)
                         if parsed.scheme and parsed.hostname:
                             hostname = f"[{parsed.hostname}]" if ':' in parsed.hostname else parsed.hostname
@@ -445,7 +443,6 @@ class LinkOpenerApp:
                     except Exception:
                         pass
                         
-                    # 查重逻辑：首次出现的保留，后续重复的打勾
                     if val in seen:
                         if vals[0] != "☑":
                             vals[0] = "☑"
@@ -453,13 +450,11 @@ class LinkOpenerApp:
                     else:
                         seen.add(val)
                         
-                # 将清洗结果和勾选状态更新回表格
                 self.tree.item(item, values=vals)
                 
-            self.log(f"👯 链接查重清洗完毕：已剥离端口及后缀，并勾选 {count} 条重复链接（保留唯一根地址）。")
+            self.log(f"链接查重清洗完毕：已剥离端口及后缀，并勾选 {count} 条重复链接（保留唯一根地址）。")
             
         else:
-            # === 其他列的原有查重逻辑：无差别全部勾选 ===
             val_counts = {}
             for item in self.tree.get_children():
                 val = str(self.tree.item(item, 'values')[col])
@@ -476,7 +471,7 @@ class LinkOpenerApp:
                         self.tree.item(item, values=vals)
                         count += 1
                         
-            self.log(f"👯 目标列查重完毕：已无差别勾选 {count} 条存在重复的数据。")
+            self.log(f"目标列查重完毕：已无差别勾选 {count} 条存在重复的数据。")
 
     def copy_column_all(self):
         col = self.get_target_col()
@@ -491,27 +486,28 @@ class LinkOpenerApp:
         if results:
             self.root.clipboard_clear()
             self.root.clipboard_append("\n".join(results))
-            self.log(f"📋 已成功提取第 {col+1} 列的 {len(results)} 条有效数据到剪贴板。")
+            self.log(f"已成功提取第 {col+1} 列的 {len(results)} 条有效数据到剪贴板。")
         else:
-            self.log("📋 目标列没有可提取的有效数据。")
+            self.log("目标列没有可提取的有效数据。")
 
     def setup_bottom_area(self):
         btn_frame = tk.Frame(self.bottom_frame, bg="#F5F5F7")
         btn_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=15, pady=10)
         
-        btn_opt = {"font": ("Microsoft YaHei", 9, "bold"), "width": 16, "bd": 0, "pady": 6, "anchor": "w", "padx": 15}
+        # 居中对齐按钮样式
+        btn_opt = {"font": ("Microsoft YaHei", 9, "bold"), "width": 16, "bd": 0, "pady": 6, "anchor": "center"}
         
         top_btn_group = tk.Frame(btn_frame, bg="#F5F5F7")
         top_btn_group.pack(side=tk.TOP, fill=tk.X)
         
-        self.btn_window_mode = tk.Button(top_btn_group, text="🖥️   切换为全屏模式", bg="#007AFF", fg="white", **btn_opt, command=self.toggle_window_mode)
+        self.btn_window_mode = tk.Button(top_btn_group, text="切换为全屏模式", bg="#007AFF", fg="white", **btn_opt, command=self.toggle_window_mode)
         self.btn_window_mode.pack(pady=(0, 10))
         
-        tk.Button(top_btn_group, text="💾   保存全局配置", bg="#34C759", fg="white", **btn_opt, command=self.save_app_config).pack(pady=5)
-        tk.Button(top_btn_group, text="🗑️   动态清空表格", bg="#8E8E93", fg="white", **btn_opt, command=self.clear_table).pack(pady=5)
-        tk.Button(top_btn_group, text="➖   动态删除勾选行", bg="#FF3B30", fg="white", **btn_opt, command=self.delete_checked_rows).pack(pady=5)
+        tk.Button(top_btn_group, text="保存全局配置", bg="#34C759", fg="white", **btn_opt, command=self.save_app_config).pack(pady=5)
+        tk.Button(top_btn_group, text="动态清空表格", bg="#8E8E93", fg="white", **btn_opt, command=self.clear_table).pack(pady=5)
+        tk.Button(top_btn_group, text="动态删除勾选行", bg="#FF3B30", fg="white", **btn_opt, command=self.delete_checked_rows).pack(pady=5)
 
-        self.btn_bp = tk.Button(btn_frame, text="🕷️\nBP 启动\n(右键重设路径)", bg="#5856D6", fg="white", font=("Microsoft YaHei", 11, "bold"), width=13, height=3, bd=0, command=self.start_bp)
+        self.btn_bp = tk.Button(btn_frame, text="BP 启动\n(右键重设路径)", bg="#5856D6", fg="white", font=("Microsoft YaHei", 11, "bold"), width=13, height=3, bd=0, command=self.start_bp, justify=tk.CENTER)
         self.btn_bp.pack(side=tk.BOTTOM, pady=10)
         self.btn_bp.bind("<Button-3>", self.reconfigure_bp)
 
@@ -522,17 +518,14 @@ class LinkOpenerApp:
 
         self.tab_fofa = tk.Frame(self.notebook, bg="white")
         self.tab_check = tk.Frame(self.notebook, bg="white")
-        self.tab_pentest = tk.Frame(self.notebook, bg="white")
         self.tab_text_dedup = tk.Frame(self.notebook, bg="white")
         
         self.notebook.add(self.tab_fofa, text=" 1. FOFA 采集 ")
         self.notebook.add(self.tab_check, text=" 2. 资产管理与测活 ")
-        self.notebook.add(self.tab_pentest, text=" 3. 自动化 Payload ")
-        self.notebook.add(self.tab_text_dedup, text=" 4. 文本去重清洗 ")
+        self.notebook.add(self.tab_text_dedup, text=" 3. 文本去重清洗 ")
 
         self.setup_fofa_tab()
         self.setup_check_tab()
-        self.setup_pentest_tab()
         self.setup_text_dedup_tab()
 
         log_frame = tk.LabelFrame(self.bottom_frame, text="实战日志", bg="#F5F5F7", font=("Microsoft YaHei", 9, "bold"))
@@ -580,24 +573,22 @@ class LinkOpenerApp:
         self.entry_del_target = tk.Entry(f_del, width=20, bg="#FFF0E0", bd=0)
         self.entry_del_target.pack(side=tk.LEFT, ipady=3, padx=5)
         
-        tk.Button(f_del, text="✂️ 删除自身及右边", bg="#FF9500", fg="white", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=15, command=self.delete_self_and_right).pack(side=tk.LEFT, padx=5)
+        tk.Button(f_del, text="删除自身及右边", bg="#FF9500", fg="white", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=15, command=self.delete_self_and_right).pack(side=tk.LEFT, padx=5)
         tk.Label(f_del, text="(输入需要剔除的尾部特征，如 '?' 或 '/'，将直接修改主文本文件)", bg="white", font=("Arial", 8), fg="#8E8E93").pack(side=tk.LEFT, padx=5)
 
-        # ====== 新增：提取表格 URL 并用逗号连接功能 ======
         ttk.Separator(t, orient='horizontal').pack(fill=tk.X, pady=10)
         
         f_join = tk.Frame(t, bg="white")
         f_join.pack(fill=tk.X, pady=5)
         tk.Label(f_join, text="表格资产提取:", bg="#F2F2F7", font=("Microsoft YaHei", 9, "bold"), width=16, anchor="e").pack(side=tk.LEFT, ipady=3, padx=(0, 5))
         
-        btn_join = tk.Button(f_join, text="🔗 将URL使用英文逗号连接并复制", bg="#5856D6", fg="white", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=15, command=self.join_urls_with_comma)
+        btn_join = tk.Button(f_join, text="将URL使用英文逗号连接并复制", bg="#5856D6", fg="white", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=15, command=self.join_urls_with_comma)
         btn_join.pack(side=tk.LEFT, padx=5)
         tk.Label(f_join, text="(一键提取上方表格中的所有URL，用英文逗号拼接并自动存入剪贴板)", bg="white", font=("Arial", 8), fg="#8E8E93").pack(side=tk.LEFT, padx=5)
 
     def join_urls_with_comma(self):
         urls = []
         for item in self.tree.get_children():
-            # 表格第6列（资产链接）的索引是5
             val = str(self.tree.item(item, 'values')[5])
             if val and val not in ("-", "", "待测"):
                 urls.append(val)
@@ -608,10 +599,9 @@ class LinkOpenerApp:
             
         result_str = ",".join(urls)
         
-        # 写入剪贴板
         self.root.clipboard_clear()
         self.root.clipboard_append(result_str)
-        self.log(f"🔗 成功提取了 {len(urls)} 条 URL，已用逗号连接并自动复制到了剪贴板！")
+        self.log(f"成功提取了 {len(urls)} 条 URL，已用逗号连接并自动复制到了剪贴板！")
         messagebox.showinfo("提取成功", f"处理完成！\n\n成功将上方表格内的 {len(urls)} 条 URL 拼接，并已复制到您的剪贴板。")
 
     def browse_txt_for_entry(self, entry_widget, config_key):
@@ -639,9 +629,9 @@ class LinkOpenerApp:
             with open(path, 'w', encoding='utf-8') as f:
                 f.write('\n'.join(unique_lines) + '\n')
                 
-            self.log(f"✅ 文件自去重完毕: {os.path.basename(path)} | 剔除 {original_len - new_len} 条重复数据。")
+            self.log(f"文件自去重完毕: {os.path.basename(path)} | 剔除 {original_len - new_len} 条重复数据。")
         except Exception as e:
-            self.log(f"❌ 自去重失败: {str(e)}")
+            self.log(f"自去重失败: {str(e)}")
 
     def cross_deduplicate(self):
         main_path = self.entry_dedup_main.get().strip()
@@ -669,7 +659,7 @@ class LinkOpenerApp:
                     sub_set.add(line)
                     
             if not new_unique_lines:
-                self.log("ℹ️ 交叉比对完成，主文本中没有发现任何新内容。")
+                self.log("交叉比对完成，主文本中没有发现任何新内容。")
                 return
                 
             with open(sub_path, 'w', encoding='utf-8') as f:
@@ -683,10 +673,10 @@ class LinkOpenerApp:
                 self.tree.insert("", "end", values=("☐", i, "-", "-", "-", link, "-", "待测", "-"), tags=(tag,))
             self.update_range_end()
             
-            self.log(f"🌟 交叉去重完毕！发现 {len(new_unique_lines)} 条新资产，已覆盖保存至副文本，并成功载入表格准备测活！")
+            self.log(f"交叉去重完毕！发现 {len(new_unique_lines)} 条新资产，已覆盖保存至副文本，并成功载入表格准备测活！")
             if HAS_WINSOUND: winsound.MessageBeep(winsound.MB_OK)
         except Exception as e:
-            self.log(f"❌ 交叉去重失败: {str(e)}")
+            self.log(f"交叉去重失败: {str(e)}")
 
     def delete_self_and_right(self):
         path = self.entry_dedup_main.get().strip()
@@ -718,9 +708,9 @@ class LinkOpenerApp:
             with open(path, 'w', encoding='utf-8') as f:
                 f.write('\n'.join(new_lines) + '\n')
                 
-            self.log(f"✂️ 截断清洗完毕: 成功切断了 {mod_count} 条包含 '{target}' 的尾巴脏数据。")
+            self.log(f"截断清洗完毕: 成功切断了 {mod_count} 条包含 '{target}' 的尾巴脏数据。")
         except Exception as e:
-            self.log(f"❌ 截断处理失败: {str(e)}")
+            self.log(f"截断处理失败: {str(e)}")
 
     def setup_fofa_tab(self):
         f = tk.Frame(self.tab_fofa, bg="white", padx=15, pady=15)
@@ -744,7 +734,7 @@ class LinkOpenerApp:
         self.entry_fofa_size.insert(0, self.config_data.get("fofa_size", "100"))
         self.entry_fofa_size.grid(row=2, column=3, pady=5, padx=5, ipady=3)
 
-        self.btn_fofa_search = tk.Button(f, text="🔍 开始拉取数据", bg="#007AFF", fg="white", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=20, command=self.start_fofa_search)
+        self.btn_fofa_search = tk.Button(f, text="开始拉取数据", bg="#007AFF", fg="white", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=20, command=self.start_fofa_search)
         self.btn_fofa_search.grid(row=3, column=1, pady=10, sticky="w")
 
         ttk.Separator(f, orient='horizontal').grid(row=4, column=0, columnspan=4, sticky="ew", pady=15)
@@ -783,25 +773,25 @@ class LinkOpenerApp:
 
         f_btn_batch = tk.Frame(f, bg="white")
         f_btn_batch.grid(row=9, column=1, columnspan=3, pady=10, sticky="w")
-        self.btn_fofa_batch = tk.Button(f_btn_batch, text="🔍 FOFA指纹TXT查询", bg="#FF9500", fg="white", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=20, command=self.batch_fofa_from_txt)
+        self.btn_fofa_batch = tk.Button(f_btn_batch, text="FOFA指纹TXT查询", bg="#FF9500", fg="white", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=20, command=self.batch_fofa_from_txt)
         self.btn_fofa_batch.pack(side=tk.LEFT)
-        self.btn_stop_batch = tk.Button(f_btn_batch, text="⏹ 查询完当前资产停止", bg="#E5E5EA", fg="#A1A1A6", disabledforeground="#A1A1A6", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=15, state="disabled", command=self.stop_fofa_batch)
+        self.btn_stop_batch = tk.Button(f_btn_batch, text="查询完当前资产停止", bg="#E5E5EA", fg="#A1A1A6", disabledforeground="#A1A1A6", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=15, state="disabled", command=self.stop_fofa_batch)
         self.btn_stop_batch.pack(side=tk.LEFT, padx=10)
 
     def stop_fofa_batch(self):
         self.stop_fofa_batch_flag = True
         if hasattr(self, 'btn_stop_batch'):
             self.btn_stop_batch.config(state="disabled", text="正在等待当前轮次跑完...")
-        self.log("⚠️ 已触发优雅停止指令！程序将在正在跑的资产检索完毕后安全退出...")
+        self.log("已触发优雅停止指令！程序将在正在跑的资产检索完毕后安全退出...")
 
     def setup_check_tab(self):
         c = tk.Frame(self.tab_check, bg="white", padx=15, pady=5)
         c.pack(fill=tk.BOTH, expand=True)
 
         r1 = tk.Frame(c, bg="white"); r1.pack(fill=tk.X, pady=2)
-        tk.Button(r1, text="📋 粘贴剪贴板链接", bg="#F2F2F7", bd=0, command=self.paste_links).pack(side=tk.LEFT, padx=5)
-        tk.Button(r1, text="✂️ 动态去重(链接)", bg="#F2F2F7", bd=0, command=self.remove_duplicates).pack(side=tk.LEFT, padx=5)
-        tk.Button(r1, text="🔄 反选所有复选框", bg="#F2F2F7", bd=0, command=self.invert_selection).pack(side=tk.LEFT, padx=5)
+        tk.Button(r1, text="粘贴剪贴板链接", bg="#F2F2F7", bd=0, command=self.paste_links).pack(side=tk.LEFT, padx=5)
+        tk.Button(r1, text="动态去重(链接)", bg="#F2F2F7", bd=0, command=self.remove_duplicates).pack(side=tk.LEFT, padx=5)
+        tk.Button(r1, text="反选所有复选框", bg="#F2F2F7", bd=0, command=self.invert_selection).pack(side=tk.LEFT, padx=5)
 
         r_mark = tk.Frame(c, bg="white"); r_mark.pack(fill=tk.X, pady=5)
         tk.Label(r_mark, text="目标列号(1-9):", bg="white", font=("Microsoft YaHei", 9, "bold"), fg="#5856D6").pack(side=tk.LEFT)
@@ -813,9 +803,9 @@ class LinkOpenerApp:
         self.entry_mark_keyword = tk.Entry(r_mark, width=15, bg="#F2F2F7", bd=0)
         self.entry_mark_keyword.pack(side=tk.LEFT, padx=5, ipady=2)
         
-        tk.Button(r_mark, text="🎯 标记包含项", bg="#E5E5EA", bd=0, command=self.mark_contains).pack(side=tk.LEFT, padx=5)
-        tk.Button(r_mark, text="👯 目标列全部查重", bg="#E5E5EA", fg="#FF3B30", bd=0, command=self.mark_duplicates).pack(side=tk.LEFT, padx=5)
-        tk.Button(r_mark, text="📋 目标列全部复制", bg="#E5E5EA", bd=0, command=self.copy_column_all).pack(side=tk.LEFT, padx=5)
+        tk.Button(r_mark, text="标记包含项", bg="#E5E5EA", bd=0, command=self.mark_contains).pack(side=tk.LEFT, padx=5)
+        tk.Button(r_mark, text="目标列全部查重", bg="#E5E5EA", fg="#FF3B30", bd=0, command=self.mark_duplicates).pack(side=tk.LEFT, padx=5)
+        tk.Button(r_mark, text="目标列全部复制", bg="#E5E5EA", bd=0, command=self.copy_column_all).pack(side=tk.LEFT, padx=5)
 
         r_range = tk.Frame(c, bg="white"); r_range.pack(fill=tk.X, pady=5)
         tk.Label(r_range, text="操作范围(序号):", bg="white", font=("Microsoft YaHei", 9, "bold")).pack(side=tk.LEFT)
@@ -831,7 +821,7 @@ class LinkOpenerApp:
         self.entry_range_end.bind("<KeyRelease>", self.dynamic_check_range)
         tk.Label(r_range, text="*(输入数字动态勾选)", font=("Arial", 8), fg="#8E8E93", bg="white").pack(side=tk.LEFT, padx=(5, 10))
         
-        tk.Button(r_range, text="🚀 默认浏览器打开所选链接", bg="#E5E5EA", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=10, command=self.open_checked_links).pack(side=tk.LEFT, padx=5)
+        tk.Button(r_range, text="默认浏览器打开所选链接", bg="#E5E5EA", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=10, command=self.open_checked_links).pack(side=tk.LEFT, padx=5)
 
         r2 = tk.Frame(c, bg="white"); r2.pack(fill=tk.X, pady=5)
         tk.Label(r2, text="并发线程:", bg="white", font=("Microsoft YaHei", 9, "bold")).pack(side=tk.LEFT)
@@ -849,11 +839,11 @@ class LinkOpenerApp:
         self.entry_status.insert(0, self.config_data.get("status_code", "200"))
         self.entry_status.pack(side=tk.LEFT, padx=5, ipady=2)
         
-        self.btn_check = tk.Button(r2, text="⚡ 对【已勾选】资产极速测活", bg="#34C759", fg="white", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=15, command=self.start_health_check)
+        self.btn_check = tk.Button(r2, text="对【已勾选】资产极速测活", bg="#34C759", fg="white", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=15, command=self.start_health_check)
         self.btn_check.pack(side=tk.LEFT, padx=15)
-        self.btn_pause = tk.Button(r2, text="⏸ 暂停", bg="#E5E5EA", fg="#A1A1A6", disabledforeground="#A1A1A6", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=10, state="disabled", command=self.pause_health_check)
+        self.btn_pause = tk.Button(r2, text="暂停", bg="#E5E5EA", fg="#A1A1A6", disabledforeground="#A1A1A6", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=10, state="disabled", command=self.pause_health_check)
         self.btn_pause.pack(side=tk.LEFT, padx=5)
-        self.btn_stop = tk.Button(r2, text="⏹ 停止", bg="#E5E5EA", fg="#A1A1A6", disabledforeground="#A1A1A6", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=10, state="disabled", command=self.stop_health_check)
+        self.btn_stop = tk.Button(r2, text="停止", bg="#E5E5EA", fg="#A1A1A6", disabledforeground="#A1A1A6", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=10, state="disabled", command=self.stop_health_check)
         self.btn_stop.pack(side=tk.LEFT, padx=5)
 
         path_frame = tk.Frame(c, bg="white")
@@ -867,7 +857,7 @@ class LinkOpenerApp:
         self.entry_import_path.insert(0, self.config_data.get("import_path", ""))
         self.entry_import_path.pack(side=tk.LEFT, fill=tk.X, expand=True, ipady=3)
         tk.Button(f_imp, text="浏览", bg="#E5E5EA", bd=0, padx=10, command=self.select_import_file).pack(side=tk.LEFT, padx=(5, 0))
-        tk.Button(f_imp, text="📥 导入为直连资产", bg="#5856D6", fg="white", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=10, command=self.import_txt_data).pack(side=tk.LEFT, padx=(5, 0))
+        tk.Button(f_imp, text="导入为直连资产", bg="#5856D6", fg="white", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=10, command=self.import_txt_data).pack(side=tk.LEFT, padx=(5, 0))
         self.enable_drag_drop(self.entry_import_path, 'txt')
         
         f_exp = tk.Frame(path_frame, bg="white")
@@ -878,7 +868,7 @@ class LinkOpenerApp:
         self.entry_export_dir.insert(0, self.config_data.get("export_dir", ""))
         self.entry_export_dir.pack(side=tk.LEFT, fill=tk.X, expand=True, ipady=3)
         tk.Button(f_exp, text="浏览", bg="#E5E5EA", bd=0, padx=10, command=self.select_export_dir).pack(side=tk.LEFT, padx=(5, 0))
-        tk.Button(f_exp, text="📁 一键导出", bg="#007AFF", fg="white", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=10, command=self.export_txt_data).pack(side=tk.LEFT, padx=(5, 0))
+        tk.Button(f_exp, text="一键导出", bg="#007AFF", fg="white", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=10, command=self.export_txt_data).pack(side=tk.LEFT, padx=(5, 0))
         self.enable_drag_drop(self.entry_export_dir, 'dir')
 
         r4 = tk.Frame(c, bg="white"); r4.pack(fill=tk.X, pady=5)
@@ -892,48 +882,6 @@ class LinkOpenerApp:
 
         self.var_auto_shutdown = tk.BooleanVar(value=False)
         tk.Checkbutton(r4, text="测试完成后自动保存并关机", variable=self.var_auto_shutdown, bg="white", font=("Microsoft YaHei", 9, "bold"), fg="#FF3B30").pack(side=tk.RIGHT, padx=5)
-
-    def setup_pentest_tab(self):
-        p = tk.Frame(self.tab_pentest, bg="white", padx=15, pady=15)
-        p.pack(fill=tk.BOTH, expand=True)
-        
-        tk.Label(p, text="拼接路径 (URI):", bg="white", font=("Microsoft YaHei", 9, "bold")).grid(row=0, column=0, sticky="w")
-        self.entry_uri = tk.Entry(p, width=45, bg="#F2F2F7", bd=0)
-        self.entry_uri.insert(0, self.config_data.get("pentest_uri", "/admin/login.php"))
-        self.entry_uri.grid(row=0, column=1, columnspan=2, pady=5, padx=5, ipady=3, sticky="w")
-        
-        tk.Label(p, text="基础 POST 数据:", bg="white", font=("Microsoft YaHei", 9, "bold")).grid(row=1, column=0, sticky="w")
-        self.entry_post = tk.Entry(p, width=45, bg="#F2F2F7", bd=0)
-        self.entry_post.insert(0, self.config_data.get("pentest_post", "user=admin&pass=123456"))
-        self.entry_post.grid(row=1, column=1, columnspan=2, pady=5, padx=5, ipady=3, sticky="w")
-        tk.Label(p, text="(留空则发起 GET 请求)", font=("Arial", 8), fg="#8E8E93", bg="white").grid(row=1, column=3, sticky="w")
-
-        f_token = tk.Frame(p, bg="white")
-        f_token.grid(row=2, column=0, columnspan=4, sticky="w", pady=10)
-
-        self.var_enable_token = tk.BooleanVar(value=self.config_data.get("enable_token", False))
-        tk.Checkbutton(f_token, text="启用 Token 爆破/提取", variable=self.var_enable_token, bg="white", font=("Microsoft YaHei", 9, "bold"), fg="#5856D6").pack(side=tk.LEFT)
-
-        tk.Label(f_token, text="左特征:", bg="white").pack(side=tk.LEFT, padx=(10, 2))
-        self.entry_token_left = tk.Entry(f_token, width=20, bg="#F2F2F7", bd=0)
-        self.entry_token_left.insert(0, self.config_data.get("token_left", 'name="token" value="'))
-        self.entry_token_left.pack(side=tk.LEFT, ipady=3)
-
-        tk.Label(f_token, text="拼接参数名:", bg="white").pack(side=tk.LEFT, padx=(10, 2))
-        self.entry_token_param = tk.Entry(f_token, width=10, bg="#F2F2F7", bd=0)
-        self.entry_token_param.insert(0, self.config_data.get("token_param", "token"))
-        self.entry_token_param.pack(side=tk.LEFT, ipady=3)
-
-        tk.Label(f_token, text="右特征:", bg="white").pack(side=tk.LEFT, padx=(10, 2))
-        self.entry_token_right = tk.Entry(f_token, width=8, bg="#F2F2F7", bd=0)
-        self.entry_token_right.insert(0, self.config_data.get("token_right", '">'))
-        self.entry_token_right.pack(side=tk.LEFT, ipady=3)
-
-        self.var_enable_cors = tk.BooleanVar(value=self.config_data.get("enable_cors", False))
-        tk.Checkbutton(f_token, text="CORS跨域漏洞", variable=self.var_enable_cors, bg="white", font=("Microsoft YaHei", 9, "bold"), fg="#34C759").pack(side=tk.LEFT, padx=15)
-
-        self.btn_pentest = tk.Button(p, text="🔥 运行 Payload 极速探测", bg="#FF9500", fg="white", font=("Microsoft YaHei", 9, "bold"), bd=0, padx=15, pady=5, command=self.start_pentest_scan)
-        self.btn_pentest.grid(row=3, column=1, pady=15, sticky="w")
         
     def log(self, msg):
         t = time.strftime("%H:%M:%S")
@@ -961,14 +909,6 @@ class LinkOpenerApp:
             self.config_data["dedup_main_txt"] = self.entry_dedup_main.get().strip()
         if hasattr(self, 'entry_dedup_sub'):
             self.config_data["dedup_sub_txt"] = self.entry_dedup_sub.get().strip()
-
-        if hasattr(self, 'entry_uri'): self.config_data["pentest_uri"] = self.entry_uri.get().strip()
-        if hasattr(self, 'entry_post'): self.config_data["pentest_post"] = self.entry_post.get().strip()
-        if hasattr(self, 'var_enable_token'): self.config_data["enable_token"] = self.var_enable_token.get()
-        if hasattr(self, 'entry_token_left'): self.config_data["token_left"] = self.entry_token_left.get()
-        if hasattr(self, 'entry_token_param'): self.config_data["token_param"] = self.entry_token_param.get().strip()
-        if hasattr(self, 'entry_token_right'): self.config_data["token_right"] = self.entry_token_right.get()
-        if hasattr(self, 'var_enable_cors'): self.config_data["enable_cors"] = self.var_enable_cors.get()
             
         save_global_config(self.config_data)
         
@@ -1022,7 +962,7 @@ class LinkOpenerApp:
         if self.is_animating: return
         items_to_del = [item for item in self.tree.get_children() if self.tree.item(item, 'values')[0] == "☑"]
         if not items_to_del:
-            messagebox.showwarning("提示", "请先在表格第一列【勾选】要删除的行！")
+            messagebox.showwarning("提示", "请先在表格第一列勾选要删除的行！")
             return
         self.is_animating = True
         self.log(f"开始动态清理 {len(items_to_del)} 条已勾选的记录...")
@@ -1032,7 +972,7 @@ class LinkOpenerApp:
         if self.is_animating: return
         selected = list(self.tree.selection())
         if not selected:
-            messagebox.showwarning("提示", "请先在表格中【点击高亮】要删除的行。")
+            messagebox.showwarning("提示", "请先在表格中点击高亮要删除的行。")
             return
         self.is_animating = True
         self.log(f"开始动态清理 {len(selected)} 条高亮选中的记录...")
@@ -1083,8 +1023,8 @@ class LinkOpenerApp:
         if path:
             self.config_data["bp_path"] = path
             save_global_config(self.config_data)
-            self.log(f"[*] BP 启动路径已更新并保存。")
-            messagebox.showinfo("配置成功", f"BP路径已重新配置！\n现在可以直接左键点击启动了。")
+            self.log("BP 启动路径已更新并保存。")
+            messagebox.showinfo("配置成功", "BP路径已重新配置！\n现在可以直接左键点击启动了。")
 
     def start_bp(self):
         bp_path = self.config_data.get("bp_path", "")
@@ -1105,7 +1045,7 @@ class LinkOpenerApp:
                 subprocess.Popen(['wscript', bp_path], cwd=bp_dir, creationflags=flags)
             else:
                 subprocess.Popen(f'"{bp_path}"', shell=True, cwd=bp_dir, creationflags=flags)
-            self.log("[-] 蜘蛛已释放！BP 启动命令发送成功。")
+            self.log("蜘蛛已释放！BP 启动命令发送成功。")
         except Exception as e:
             self.log(f"启动 BP 失败: {str(e)}")
             messagebox.showerror("启动失败", f"无法启动，可能文件有误或未安装Java。\n\n解决办法：右键点击『BP启动』按钮，重新选择！\n\n报错详情: {str(e)}")
@@ -1193,7 +1133,7 @@ class LinkOpenerApp:
     def import_txt_data(self):
         path = self.entry_import_path.get().strip()
         if not path or not os.path.isfile(path):
-            messagebox.showwarning("提示", "导入失败！\n请先点击【浏览】按钮或拖入一个真实存在的 TXT 文件。")
+            messagebox.showwarning("提示", "导入失败！\n请先点击浏览按钮或拖入一个真实存在的 TXT 文件。")
             return
             
         try:
@@ -1229,7 +1169,7 @@ class LinkOpenerApp:
         else:
             folder = self.entry_export_dir.get().strip()
             if not folder or not os.path.isdir(folder):
-                messagebox.showwarning("提示", "未指定导出文件夹！请先拖入或【浏览】选择保存位置。")
+                messagebox.showwarning("提示", "未指定导出文件夹！请先拖入或浏览选择保存位置。")
                 self.select_export_dir()
                 folder = self.entry_export_dir.get().strip()
                 if not folder: return 
@@ -1258,7 +1198,7 @@ class LinkOpenerApp:
         export_path = os.path.join(export_folder, filename)
 
         self.export_txt_data(auto_path=export_path)
-        self.log(f"⚠️ 系统将在 60 秒后关机！如需取消，请在 cmd 输入 shutdown -a")
+        self.log("系统将在 60 秒后关机！如需取消，请在 cmd 输入 shutdown -a")
         os.system("shutdown -s -t 60")
 
     def reindex_table(self):
@@ -1272,21 +1212,20 @@ class LinkOpenerApp:
     def pause_health_check(self):
         if self.pause_event.is_set():
             self.pause_event.clear()
-            self.btn_pause.config(text="▶ 继续", bg="#34C759", fg="white")
-            self.log("⚠️ 测活已被暂停...")
+            self.btn_pause.config(text="继续", bg="#34C759", fg="white")
+            self.log("测活已被暂停...")
         else:
             self.pause_event.set()
-            self.btn_pause.config(text="⏸ 暂停", bg="#FF9500", fg="white")
-            self.log("▶ 测活恢复继续...")
+            self.btn_pause.config(text="暂停", bg="#FF9500", fg="white")
+            self.log("测活恢复继续...")
 
     def stop_health_check(self):
         self.stop_scan = True
         self.pause_event.set() 
-        self.log("⏹ 正在停止测活，等待当前线程退出...")
+        self.log("正在停止测活，等待当前线程退出...")
         self.btn_pause.config(state="disabled", bg="#E5E5EA", fg="#A1A1A6")
         self.btn_stop.config(state="disabled", bg="#E5E5EA", fg="#A1A1A6")
 
-    # ========================== 【核心重构：FOFA批量查询引擎 (无限制并发版)】 ==========================
     def batch_fofa_from_txt(self):
         fofa_key = self.entry_fofa_key.get().strip()
         size_val = self.entry_fofa_size.get().strip()
@@ -1303,7 +1242,7 @@ class LinkOpenerApp:
         try: threshold = int(self.entry_min_count.get().strip())
         except: threshold = 10
         try: fofa_threads = int(self.entry_fofa_threads.get().strip())
-        except: fofa_threads = 3 # 默认多线程
+        except: fofa_threads = 3
         
         export_folder = self.entry_export_dir.get().strip()
         if not export_folder or not os.path.isdir(export_folder):
@@ -1315,7 +1254,7 @@ class LinkOpenerApp:
 
         self.stop_fofa_batch_flag = False
         self.btn_fofa_batch.config(state="disabled", text="批量查询中...")
-        self.btn_stop_batch.config(state="normal", bg="#FF3B30", fg="white", text="⏹ 查询完当前资产停止")
+        self.btn_stop_batch.config(state="normal", bg="#FF3B30", fg="white", text="查询完当前资产停止")
         self.log(f"正在准备启动 FOFA 多线程涡轮并发引擎 (当前设置 {fofa_threads} 线程全开)...")
         
         def _task():
@@ -1324,8 +1263,8 @@ class LinkOpenerApp:
                     fp_lines = [line.strip() for line in f.readlines() if line.strip()]
             except Exception as e:
                 self.root.after(0, lambda: messagebox.showerror("错误", f"指纹TXT读取失败: {e}"))
-                self.root.after(0, lambda: self.btn_fofa_batch.config(state="normal", text="🔍 FOFA指纹TXT查询"))
-                self.root.after(0, lambda: self.btn_stop_batch.config(state="disabled", bg="#E5E5EA", fg="#A1A1A6", text="⏹ 查询完当前资产停止"))
+                self.root.after(0, lambda: self.btn_fofa_batch.config(state="normal", text="FOFA指纹TXT查询"))
+                self.root.after(0, lambda: self.btn_stop_batch.config(state="disabled", bg="#E5E5EA", fg="#A1A1A6", text="查询完当前资产停止"))
                 return
                 
             asset_lines = []
@@ -1335,8 +1274,8 @@ class LinkOpenerApp:
                         asset_lines = [line.strip() for line in f.readlines() if line.strip()]
                 except Exception as e:
                     self.root.after(0, lambda: messagebox.showerror("错误", f"资产TXT读取失败: {e}"))
-                    self.root.after(0, lambda: self.btn_fofa_batch.config(state="normal", text="🔍 FOFA指纹TXT查询"))
-                    self.root.after(0, lambda: self.btn_stop_batch.config(state="disabled", bg="#E5E5EA", fg="#A1A1A6", text="⏹ 查询完当前资产停止"))
+                    self.root.after(0, lambda: self.btn_fofa_batch.config(state="normal", text="FOFA指纹TXT查询"))
+                    self.root.after(0, lambda: self.btn_stop_batch.config(state="disabled", bg="#E5E5EA", fg="#A1A1A6", text="查询完当前资产停止"))
                     return
 
             all_to_del_ids = []
@@ -1344,7 +1283,7 @@ class LinkOpenerApp:
 
             def _process_single_asset(asset):
                 if self.stop_fofa_batch_flag: return
-                self.root.after(0, lambda a=asset: self.log(f"\n--- 🎯 [线程启动] 锁定资产: {a} ---"))
+                self.root.after(0, lambda a=asset: self.log(f"\n--- 线程启动: 锁定资产 {a} ---"))
                 
                 asset_all_success = True 
                 asset_output_blocks = []
@@ -1361,7 +1300,7 @@ class LinkOpenerApp:
                     qbase64 = base64.b64encode(query.encode('utf-8')).decode('utf-8')
                     fields_str = "host,ip,port,country_name,title,product,icp"
                     params = {"key": fofa_key, "qbase64": qbase64, "size": size_val, "fields": fields_str}
-                    url = "https://fofa.icu/api/v1/search/all"
+                    url = "https://fofa.info/api/v1/search/all"
                     
                     try:
                         r = requests.get(url, params=params, headers=HEADERS, timeout=60, verify=False)
@@ -1425,7 +1364,7 @@ class LinkOpenerApp:
                         asset_all_success = False 
                         
                     if not asset_all_success:
-                        self.root.after(0, lambda a=asset: self.log(f"⚠️ [{a}] 触发异常保护，放弃剩余指纹，跳至下一资产..."))
+                        self.root.after(0, lambda a=asset: self.log(f"[{a}] 触发异常保护，放弃剩余指纹，跳至下一资产..."))
                         break 
 
                 if asset_output_blocks:
@@ -1451,11 +1390,11 @@ class LinkOpenerApp:
                                     with open(asset_path, 'w', encoding='utf-8') as f_write:
                                         for cl in current_lines:
                                             f_write.write(f"{cl}\n")
-                                    self.root.after(0, lambda a=asset: self.log(f"✅ 资产 {a} 探测完毕，已安全物理抹除！"))
+                                    self.root.after(0, lambda a=asset: self.log(f"资产 {a} 探测完毕，已安全物理抹除！"))
                             except Exception:
                                 pass
                     else:
-                        self.root.after(0, lambda a=asset: self.log(f"⏸️ 资产 {a} 存在报错，未彻底查完，已保留在TXT中防丢失！"))
+                        self.root.after(0, lambda a=asset: self.log(f"资产 {a} 存在报错，未彻底查完，已保留在TXT中防丢失！"))
 
             def _process_single_fp(fp):
                 if self.stop_fofa_batch_flag: return
@@ -1464,7 +1403,7 @@ class LinkOpenerApp:
                 qbase64 = base64.b64encode(fp.encode('utf-8')).decode('utf-8')
                 fields_str = "host,ip,port,country_name,title,product,icp"
                 params = {"key": fofa_key, "qbase64": qbase64, "size": size_val, "fields": fields_str}
-                url = "https://fofa.icu/api/v1/search/all"
+                url = "https://fofa.info/api/v1/search/all"
                 
                 try:
                     r = requests.get(url, params=params, headers=HEADERS, timeout=60, verify=False)
@@ -1521,34 +1460,33 @@ class LinkOpenerApp:
                     self.root.after(0, lambda q=fp, err=str(e): self.log(f"[{q}] 查询异常: {err}"))
 
             if asset_lines:
-                self.root.after(0, lambda: self.log(f"⚡ 启动并发引擎队列 (已解除全局锁，{fofa_threads} 线程全速并发)，开始交叉探测..."))
+                self.root.after(0, lambda: self.log(f"启动并发引擎队列 (已解除全局锁，{fofa_threads} 线程全速并发)，开始交叉探测..."))
                 with concurrent.futures.ThreadPoolExecutor(max_workers=fofa_threads) as executor:
                     futures = [executor.submit(_process_single_asset, a) for a in asset_lines]
                     concurrent.futures.wait(futures) 
             else:
-                self.root.after(0, lambda: self.log(f"⚡ 启动并发引擎队列 (已解除全局锁，{fofa_threads} 线程全速并发)，开始批量采集指纹！"))
+                self.root.after(0, lambda: self.log(f"启动并发引擎队列 (已解除全局锁，{fofa_threads} 线程全速并发)，开始批量采集指纹！"))
                 with concurrent.futures.ThreadPoolExecutor(max_workers=fofa_threads) as executor:
                     futures = [executor.submit(_process_single_fp, fp) for fp in fp_lines]
                     concurrent.futures.wait(futures)
 
             self.root.after(0, lambda: self.log("=" * 30))
             if self.stop_fofa_batch_flag:
-                self.root.after(0, lambda: self.log("🛑 所有正在执行的资产均已处理完毕并断点保存，任务已安全终止！"))
+                self.root.after(0, lambda: self.log("所有正在执行的资产均已处理完毕并断点保存，任务已安全终止！"))
             else:
-                self.root.after(0, lambda: self.log("✅ 批量引擎任务彻底执行完毕！"))
+                self.root.after(0, lambda: self.log("批量引擎任务彻底执行完毕！"))
             
-            self.root.after(0, lambda: self.btn_fofa_batch.config(state="normal", text="🔍 FOFA指纹TXT查询"))
-            self.root.after(0, lambda: self.btn_stop_batch.config(state="disabled", bg="#E5E5EA", fg="#A1A1A6", text="⏹ 查询完当前资产停止"))
+            self.root.after(0, lambda: self.btn_fofa_batch.config(state="normal", text="FOFA指纹TXT查询"))
+            self.root.after(0, lambda: self.btn_stop_batch.config(state="disabled", bg="#E5E5EA", fg="#A1A1A6", text="查询完当前资产停止"))
             
             if all_to_del_ids:
-                self.root.after(0, lambda: self.log(f"⚠️ 识别到存在 {len(all_to_del_ids)} 条界面记录不满足阈值({threshold})。"))
+                self.root.after(0, lambda: self.log(f"识别到存在 {len(all_to_del_ids)} 条界面记录不满足阈值({threshold})。"))
                 self.root.after(1000, lambda: self.log("即将开始动态淘汰界面上的劣质资产..."))
                 self.is_animating = True
-                self.root.after(2000, lambda: self.animate_delete(all_to_del_ids, msg=f"已成功清理界面上的非标准资产。"))
+                self.root.after(2000, lambda: self.animate_delete(all_to_del_ids, msg="已成功清理界面上的非标准资产。"))
                 
         threading.Thread(target=_task, daemon=True).start()
 
-    # ========================== 【核心重构：FOFA单点查询】 ==========================
     def start_fofa_search(self):
         key, query, size = self.entry_fofa_key.get(), self.entry_fofa_query.get(), self.entry_fofa_size.get()
         if not key or not query: return
@@ -1559,10 +1497,9 @@ class LinkOpenerApp:
             qbase64 = base64.b64encode(query.encode('utf-8')).decode('utf-8')
             fields_str = "host,ip,port,country_name,title,product,icp"
             params = {"key": key, "qbase64": qbase64, "size": size, "fields": fields_str}
-            url = "https://fofa.icu/api/v1/search/all"
+            url = "https://fofa.info/api/v1/search/all"
             
             try:
-                # 【核心替换】使用 requests 绕过 TLS 指纹墙
                 r = requests.get(url, params=params, headers=HEADERS, timeout=60, verify=False)
                 data = r.json()
                     
@@ -1585,11 +1522,10 @@ class LinkOpenerApp:
                     err_msg = data.get("errmsg", "未知接口错误")
                     self.log(f"获取失败，原因: {err_msg}")
             except Exception as e: self.log(f"请求崩溃或网络错误: {str(e)}")
-            finally: self.root.after(0, lambda: self.btn_fofa_search.config(state="normal", text="🔍 开始拉取数据"))
+            finally: self.root.after(0, lambda: self.btn_fofa_search.config(state="normal", text="开始拉取数据"))
         
         threading.Thread(target=_task, daemon=True).start()
 
-    # ========================== 【核心重构：资产测活 (高可用穿透版)】 ==========================
     def start_health_check(self):
         items = [i for i in self.tree.get_children() if self.tree.item(i, 'values')[0] == "☑"]
         if not items:
@@ -1601,8 +1537,6 @@ class LinkOpenerApp:
         try: timeout_val = float(self.entry_timeout.get().strip())
         except: timeout_val = 3.0
         
-        # 【增强】支持多状态码识别。实战中 403, 301, 302 往往也是存活的Web服务
-        # 用户可以在界面输入框填 "200,403,302"
         target_codes = [c.strip() for c in self.entry_status.get().strip().replace('，', ',').split(',')]
         if not target_codes or target_codes == ['']:
             target_codes = ["200"]
@@ -1611,12 +1545,11 @@ class LinkOpenerApp:
         self.pause_event.set()
         
         self.btn_check.config(state="disabled", text="测活中...")
-        self.btn_pause.config(state="normal", text="⏸ 暂停", bg="#FF9500", fg="white")
+        self.btn_pause.config(state="normal", text="暂停", bg="#FF9500", fg="white")
         self.btn_stop.config(state="normal", bg="#FF3B30", fg="white")
         
         self.log(f"启动涡轮测活: 目标 {len(items)} 条 | 并发: {threads} | 超时: {timeout_val}s | 匹配状态码: {target_codes}")
         
-        # 【核心】全套高匿请求头，伪装成真实 Chrome 浏览器，规避基础 WAF 和 CDN 拦截
         enh_headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
@@ -1638,14 +1571,12 @@ class LinkOpenerApp:
                         url = vals[5]
                         code, length = "Error", "-"
                         
-                        # 【核心】增加 1 次容错重试机制，防止高并发时短暂的网络波动导致误杀
                         max_retries = 1
                         for attempt in range(max_retries + 1):
                             try:
-                                # 【核心】allow_redirects=True 允许跟随跳转，解决访问 http 强转 https 导致的误判
                                 r = requests.get(url, headers=enh_headers, timeout=timeout_val, verify=False, allow_redirects=True)
                                 code, length = str(r.status_code), str(len(r.content))
-                                break  # 成功则跳出重试循环
+                                break 
                             except requests.exceptions.RequestException as e:
                                 if hasattr(e, 'response') and e.response is not None: 
                                     code = str(e.response.status_code)
@@ -1655,7 +1586,6 @@ class LinkOpenerApp:
                         
                         def _gui():
                             if self.stop_scan or not self.tree.exists(it): return
-                            # 如果最终状态码在用户允许的列表里，则判定存活
                             if code in target_codes:
                                 vals[7], vals[6] = code, length
                                 row_tag = 'evenrow' if int(vals[1])%2==0 else 'oddrow'
@@ -1666,8 +1596,8 @@ class LinkOpenerApp:
                     executor.submit(_proc)
             
             self.root.after(0, self.reindex_table)
-            self.root.after(0, lambda: self.btn_check.config(state="normal", text="⚡ 对【已勾选】资产极速测活"))
-            self.root.after(0, lambda: self.btn_pause.config(state="disabled", bg="#E5E5EA", fg="#A1A1A6", text="⏸ 暂停"))
+            self.root.after(0, lambda: self.btn_check.config(state="normal", text="对【已勾选】资产极速测活"))
+            self.root.after(0, lambda: self.btn_pause.config(state="disabled", bg="#E5E5EA", fg="#A1A1A6", text="暂停"))
             self.root.after(0, lambda: self.btn_stop.config(state="disabled", bg="#E5E5EA", fg="#A1A1A6"))
             
             if not self.stop_scan:
@@ -1679,164 +1609,6 @@ class LinkOpenerApp:
                 self.root.after(0, lambda: self.log("测活已被用户手动终止。"))
             
         threading.Thread(target=_scan, daemon=True).start()
-
-    # ========================== 【核心重构：自动化 Payload】 ==========================
-    def start_pentest_scan(self):
-        enable_cors = self.var_enable_cors.get()
-        fake_origin = "https://evil-cors-test.com"
-        items = [i for i in self.tree.get_children() if self.tree.item(i, 'values')[0] == "☑"]
-        if not items:
-            messagebox.showwarning("提示", "请先在表格中勾选资产！")
-            return
-        
-        uri = self.entry_uri.get().strip()
-        base_post_data = self.entry_post.get().strip()
-        
-        try: threads = int(self.entry_threads.get().strip())
-        except: threads = 200
-        try: timeout_val = float(self.entry_timeout.get().strip())
-        except: timeout_val = 3.0
-
-        enable_token = self.var_enable_token.get()
-        t_left = self.entry_token_left.get()
-        t_param = self.entry_token_param.get().strip()
-        t_right = self.entry_token_right.get()
-
-        self.btn_pentest.config(state="disabled", text="探测攻击中...")
-        self.log(f"--- Payload探测: 目标 {len(items)} | 并发: {threads} | 超时: {timeout_val}s ---")
-        if enable_token:
-            self.log(f"[*] 已开启令牌动态绕过，参数名: {t_param}")
-        
-        def _scan():
-            with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
-                for item_id in items:
-                    def _proc(it=item_id):
-                        if not self.tree.exists(it): return
-                        vals = list(self.tree.item(it, 'values'))
-                        target = vals[5].rstrip('/') + uri
-                        code, length = "Error", "-"
-                        final_post_data = base_post_data
-
-                        try:
-                            # 【核心替换】二次握手 Token 提取使用 requests
-                            if enable_token and t_left and t_right and t_param:
-                                r_get = requests.get(target, headers={'User-Agent': 'Mozilla/5.0'}, timeout=timeout_val, verify=False)
-                                html = r_get.text
-                                
-                                token_val = ""
-                                if t_left in html:
-                                    parts = html.split(t_left, 1)
-                                    if len(parts) > 1 and t_right in parts[1]:
-                                        token_val = parts[1].split(t_right, 1)[0]
-                                
-                                if token_val:
-                                    encoded_token = urllib.parse.quote(token_val)
-                                    if final_post_data:
-                                        final_post_data += f"&{t_param}={encoded_token}"
-                                    else:
-                                        final_post_data = f"{t_param}={encoded_token}"
-                                else:
-                                    self.root.after(0, lambda t=target: self.log(f"[-] {t} 页面未匹配到左/右特征，Token提取失败"))
-
-                            req_headers = {'User-Agent': 'Mozilla/5.0'}
-                            if enable_cors:
-                                req_headers['Origin'] = fake_origin 
-
-                            # 【核心替换】Payload 发送使用 requests
-                            if final_post_data:
-                                req_headers['Content-Type'] = 'application/x-www-form-urlencoded'
-                                r = requests.post(target, data=final_post_data, headers=req_headers, timeout=timeout_val, verify=False)
-                            else:
-                                r = requests.get(target, headers=req_headers, timeout=timeout_val, verify=False)
-                                
-                            code, length = str(r.status_code), str(len(r.content))
-                            
-                            if enable_cors:
-                                acao = r.headers.get('Access-Control-Allow-Origin')
-                                acac = r.headers.get('Access-Control-Allow-Credentials')
-                                
-                                if acao == fake_origin:
-                                    if acac == 'true':
-                                        self.root.after(0, lambda t=target: self.log(f"[!!!] 发现高危 CORS 漏洞: {t} (信任恶意Origin且允许凭证)"))
-                                    else:
-                                        self.root.after(0, lambda t=target: self.log(f"[!] 发现普通 CORS 缺陷: {t} (信任恶意Origin但未允许凭证)"))                                
-                        except requests.exceptions.RequestException as e:
-                            if hasattr(e.response, 'status_code') and e.response is not None:
-                                code = str(e.response.status_code)
-                        except: code = "Timeout"
-                        
-                        def _gui():
-                            if not self.tree.exists(it): return
-                            vals[7], vals[6] = code, length
-                            tag = ('alive',) if code == "200" else ('dead',)
-                            row_tag = 'evenrow' if int(vals[1])%2==0 else 'oddrow'
-                            self.tree.item(it, values=vals, tags=(row_tag,) + tag)
-                            if code == "200": self.log(f"[+] 渗透突破口: {target} (状态:{code})")
-                        self.root.after(0, _gui)
-                    executor.submit(_proc)
-                    
-            self.root.after(0, lambda: self.log("Payload 探测任务执行完毕！"))
-            self.root.after(0, self.play_finish_sound)
-            self.root.after(0, lambda: self.btn_pentest.config(state="normal", text="🔥 运行 Payload 极速探测"))
-            
-        threading.Thread(target=_scan, daemon=True).start()
-
-    def mark_duplicates(self):
-        col = self.get_target_col()
-        if col is None: return
-        
-        count = 0
-        if col == 5:
-            # === 针对第6列（资产链接）的特殊清洗与查重逻辑 ===
-            seen = set()
-            for item in self.tree.get_children():
-                vals = list(self.tree.item(item, 'values'))
-                val = str(vals[col])
-                
-                if val not in ("-", "", "待测", "Error", "Timeout"):
-                    try:
-                        # 解析URL，精准剥离端口号及后续路径内容
-                        parsed = urllib.parse.urlparse(val)
-                        if parsed.scheme and parsed.hostname:
-                            hostname = f"[{parsed.hostname}]" if ':' in parsed.hostname else parsed.hostname
-                            clean_val = f"{parsed.scheme}://{hostname}"
-                            vals[col] = clean_val
-                            val = clean_val
-                    except Exception:
-                        pass
-                        
-                    # 查重逻辑：首次出现的保留，后续重复的打勾
-                    if val in seen:
-                        if vals[0] != "☑":
-                            vals[0] = "☑"
-                            count += 1
-                    else:
-                        seen.add(val)
-                        
-                # 将清洗结果和勾选状态更新回表格
-                self.tree.item(item, values=vals)
-                
-            self.log(f"👯 链接查重清洗完毕：已剥离端口及后缀，并勾选 {count} 条重复链接（保留唯一根地址）。")
-            
-        else:
-            # === 其他列的原有查重逻辑：无差别全部勾选 ===
-            val_counts = {}
-            for item in self.tree.get_children():
-                val = str(self.tree.item(item, 'values')[col])
-                if val in ("-", "", "待测", "Error", "Timeout"):
-                    continue
-                val_counts[val] = val_counts.get(val, 0) + 1
-                
-            for item in self.tree.get_children():
-                vals = list(self.tree.item(item, 'values'))
-                val = str(vals[col])
-                if val in val_counts and val_counts[val] > 1:
-                    if vals[0] != "☑":
-                        vals[0] = "☑"
-                        self.tree.item(item, values=vals)
-                        count += 1
-                        
-            self.log(f"👯 目标列查重完毕：已无差别勾选 {count} 条存在重复的数据。")
 
 
 # ========================== 程序入口 ==========================
